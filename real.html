@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="brain-2.png" type="image/icon type">
+    <title>HotCrossBun Detector</title>
+    <!-- <link rel="stylesheet" href="style.css"> -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
+        :root{
+            --blue: #7096D1; 
+        }
+        body{
+            margin: 0;
+            padding: 0;
+            background: url(https://media.istockphoto.com/id/1319949489/video/connected-line-and-dots-on-black-background.jpg?s=640x640&k=20&c=ybcw2s0-i9AUJsw5xL6DUQgu_hhp7jpQB6QlUcfjdYo=) no-repeat;
+            background-size: cover;
+            background-position: center center;
+        }
+        body, html {
+            height: 100%;
+            justify-content: center;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            font-family: 'Rubik',sans-serif;
+        }
+
+        .container {
+            display: flex;
+        }
+        #title {
+            margin-top: -20px;
+            font-size: 70px;
+            font-weight: 600;
+            margin-bottom: 40px; /* Increased margin for spacing */
+            color: #fff;
+            text-shadow: 2px 2px 4px var(--blue)
+            
+
+        }
+
+        .square {
+            width: 400px;
+            height: 400px;
+            background-color: #fff;
+            border-radius: 10%;
+            color: var(--blue);
+            font-weight: 250;
+            margin: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            background-size: cover; /* Set background size to cover */
+            font-family: 'Poppins',sans-serif;
+        }
+
+        .square3 {
+            width: 600px;
+            height: 30px;
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        .square3 button{
+            background-color: #081F5C;
+            padding: 7px 100px;
+            
+        }
+        .square3 p{
+            font-size: 17px;
+            font-family: 'Rubik',sans-serif;
+            color: #fff;
+            text-shadow: 2px 2px 3px #BAD6EB
+        }
+        @media (max-width:1180px){
+            #title{
+                margin-top: 30px;
+            }
+        }
+        @media screen and (max-width:1140px) {
+            #title {
+                margin-top: 10px;
+                font-size: 60px;
+                margin-bottom: 10px;
+            }
+            .square{
+                width: 300px;
+                height: 300px;
+                margin: 20px;
+            }
+            .square3{
+                width: 600px;
+                margin-top: 20px;
+                
+            }
+        }
+        @media screen and (max-width:900px) {
+            #title {
+                font-size: 60px;
+            }
+            .square{
+                width: 300px;
+                height: 300px;
+                margin: 20px;
+            }
+        }
+        @media screen and (max-width:900px) {
+            #title {
+                font-size: 60px;
+            }
+            .square{
+                width: 300px;
+                height: 300px;
+                margin: 20px;
+            }
+        }
+        @media screen and (max-width:768px) {
+            #title {
+                font-size: 50px;
+                margin-bottom: 20px;
+            }
+            .square{
+                width: 250px;
+                height: 250px;
+                margin: 20px;
+            }
+            .square3{
+                margin-top: 20px;
+            }
+        }
+        @media screen and (max-width:600px) {
+            #title {
+                font-size: 40px;
+            }
+            .square{
+                width: 200px;
+                height: 200px;
+                margin: 20px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div id="title">Hot Cross Bun Detector</div>
+    <div class="container">
+        <div class="square" id="square1">
+            <p>
+                Original MRI Picture
+            </p>
+        </div>
+        <div class="square" id="square2">
+            <p>
+                Result MRI Picture
+            </p>
+        </div>
+    </div>
+    <div class="square3" onclick="document.getElementById('upload-input').click();">
+        <button> <input type="file" id="upload-input" onchange="handleFileSelect(event)" style="display: none;">
+            <p>
+                Click here to Upload a MRI Picture
+            </p>
+        </button>
+        <!-- <p id="uploadt">Click here to Upload a MRI Picture</p>
+        <input type="file" id="upload-input" onchange="handleFileSelect(event)" style="display: none;"> -->
+    </div>
+    <script>
+        async function handleFileSelect(event) {
+            const files = event.target.files;
+            const originalImage = files[0];
+            // Do something with the selected file(s)
+            console.log(files);
+        
+            const formData = new FormData();
+            formData.append('image_file', event.target.files[0]);
+            const response = await fetch("/detect", {
+                method: "POST",
+                body: formData
+            });
+            const boxes = await response.json();
+            
+            // Clear inner HTML of square1 and square2
+            document.getElementById('square1').innerHTML = "";
+            document.getElementById('square2').innerHTML = "";
+        
+            displayImage(originalImage, 'square1'); // Display original image on square1
+            draw_image_and_boxes(originalImage, boxes); // Display image and boxes on square2
+        }
+        function draw_image_and_boxes(file, boxes) {
+            const square2 = document.getElementById('square2');
+            const img = new Image();
+            img.src = URL.createObjectURL(file);
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                ctx.strokeStyle = "#00FF00";
+                ctx.lineWidth = 3;
+                ctx.font = "18px serif";
+                boxes.forEach(([x1, y1, x2, y2, label]) => {
+                    ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+                    ctx.fillStyle = "#00ff00";
+                    const width = ctx.measureText(label).width;
+                    ctx.fillRect(x1, y1, width + 10, 25);
+                    ctx.fillStyle = "#000000";
+                    ctx.fillText(label, x1, y1 + 18);
+                });
+        
+                square2.style.backgroundImage = `url(${canvas.toDataURL()})`; // Display canvas as background
+            };
+        }
+        function displayImage(image, squareId) {
+            const square = document.getElementById(squareId);
+            square.style.backgroundImage = `url(${URL.createObjectURL(image)})`;
+        }
+    </script>
+</body>
+</html>
